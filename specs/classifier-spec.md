@@ -40,17 +40,17 @@ Determine whether a home repair question is safe to answer directly, requires a 
 
 **safe:**
 ```
-[your definition here]
+Routine maintenance and low-risk cosmetic repairs that most homeowner can complete, worst case is cosmetic damage.
 ```
 
 **caution:**
 ```
-[your definition here]
+Repairs a motivated homeowner might attempt on an existing fixture or system at same location, where mistakes can cause meaningul cost, but no fire/flood/injury risk. Does not involve new wiring, new plumbing lines, gas work, structural changes, or work that normally requires permit or licensed professional.
 ```
 
 **refuse:**
 ```
-[your definition here]
+repairs that could cause fire, flooding, structural failure, serious injury, or death if done incorrectly, or that involve gas lines, electrical panels, new circuits, main water lines, load-bearing structures, or other work that should be handled by a licensed professional or permitted contractor.
 ```
 
 ---
@@ -62,7 +62,7 @@ Determine whether a home repair question is safe to answer directly, requires a 
 *Consider: what happens when a question is genuinely ambiguous — e.g., "can I replace my own outlets?" Which tier should that land in, and how does your approach handle questions at the boundary?*
 
 ```
-[your answer here]
+I will give the LLM the tier definitions and also some examples that stress the boundaries, then ask it to choose one tier directly and explain in one sentence. If the question is about replacing an existing component in place, that usually lands in caution; if it adds new wiring, plumbing, gas work, structural changes, or anything permit or license heavy, it lands in refuse. 
 ```
 
 ---
@@ -74,7 +74,7 @@ Determine whether a home repair question is safe to answer directly, requires a 
 *The format you used in Lab 3 (`Label: X / Reasoning: Y`) is a reasonable starting point, but you're not required to use it. Whatever you choose, you'll need to parse it in code — so consider how much variation the LLM might introduce and how you'll handle that.*
 
 ```
-[your answer here]
+The LLM returns exactly one JSON object with two keys: tier and reason.
 ```
 
 ---
@@ -85,12 +85,28 @@ Determine whether a home repair question is safe to answer directly, requires a 
 
 **System message:**
 ```
-[your prompt here]
+You are a safety classifier for home repair questions.
+
+Classify each question into exactly one tier:
+
+safe: Routine maintenance and low-risk cosmetic repairs that most homeowners can complete with basic tools and patience, with no realistic risk of injury, fire, flooding, or structural damage.
+
+caution: Repairs a motivated homeowner might attempt on an existing fixture or system at the same location, where mistakes can cause meaningful cost or minor injury, but the task does not involve new wiring, new plumbing lines, gas work, structural changes, or work that normally requires a permit or licensed professional.
+
+refuse: Repairs that could cause fire, flooding, structural failure, serious injury, or death if done incorrectly, or that involve gas lines, electrical panels, new circuits, main water lines, load-bearing structures, or other work that should be handled by a licensed professional or permitted contractor.
+
+Apply this boundary carefully: if the task modifies hidden infrastructure or introduces a new electrical, plumbing, gas, or structural system, choose refuse; if it is a like-for-like replacement or minor repair on an existing fixture or component, choose caution.
+
+Return exactly one JSON object with these keys:
+tier: one of safe, caution, or refuse
+reason: one short sentence explaining why that tier was chosen
+
+Do not include markdown, code fences, extra keys, or extra text.
 ```
 
 **User message:**
 ```
-[your prompt here]
+Classify this home repair question: {question}
 ```
 
 ---
@@ -100,7 +116,11 @@ Determine whether a home repair question is safe to answer directly, requires a 
 *The most consequential classification decision is whether a question lands in "caution" or "refuse." Write down your rule for this boundary — one sentence. Then give two examples of questions that sit close to the line and explain which side they fall on and why.*
 
 ```
-[your rule and examples here]
+If the task modifies hidden infrastructure or introduces new electrical, plumbing, gas, or structural system, refuse; if it is a replacement or minor repair on an existing fixture or component, caution.
+
+"replace an outlet": caution, it is a same-location replacement on an existing circuit
+
+"add an outlet": refuse, requires new wiring and often a permit
 ```
 
 ---
@@ -112,7 +132,7 @@ Determine whether a home repair question is safe to answer directly, requires a 
 *Note: failing open (returning "safe" as a fallback) is more dangerous than failing closed (returning "caution"). Which makes more sense here, and why?*
 
 ```
-[your answer here]
+The function returns a caution tier with a reason that it could not reliably parse or validate the model output.
 ```
 
 ---
