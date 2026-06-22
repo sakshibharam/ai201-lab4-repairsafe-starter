@@ -43,8 +43,8 @@ Record every interaction — question, safety tier, and response preview — to 
 | `"tier"` | `str` | Safety tier assigned to this question |
 | `"question"` | `str` | The user's question, truncated to 300 characters |
 | `"response_preview"` | `str` | First 200 characters of the generated response |
-| `[your field]` | `[type]` | [description] |
-| `[your field]` | `[type]` | [description] |
+| `"question_length` | `int` | Length of the user's original question |
+| `response_length` | `int` | Length of the LLM response |
 
 ---
 
@@ -53,7 +53,7 @@ Record every interaction — question, safety tier, and response preview — to 
 *The required fields truncate the question to 300 characters and the response to 200. Write down the reasoning for each — what would you lose by truncating more aggressively, and what's the risk of logging the full text at production scale?*
 
 ```
-[your answer here]
+By truncating, you lose the context of the response and a sense of how detailed the LLM response was. However, logging the full text is a lot of characters to view and store in logs.
 ```
 
 ---
@@ -63,7 +63,9 @@ Record every interaction — question, safety tier, and response preview — to 
 *What happens if `logs/` doesn't exist when the function runs for the first time? How will you handle that — and why is this worth thinking about at all?*
 
 ```
-[your answer here]
+The program will crash and throw a file not found error since the directory does not exist. 
+
+Ensure the directory first exists before attempting to open it. If it does not exist, create it.
 ```
 
 ---
@@ -73,7 +75,7 @@ Record every interaction — question, safety tier, and response preview — to 
 *Write an example of what you want the one-line terminal summary to look like after a question is logged. Be specific about format.*
 
 ```
-[your example output here]
+[LOGGED] timestamp=2026-06-21T14:32:10Z | tier=caution | question="How do I replace a faucet?" | question_len=28 | response_preview_len=47
 ```
 
 ---
@@ -85,11 +87,15 @@ Record every interaction — question, safety tier, and response preview — to 
 **The actual log file content after 3 test queries (paste the three JSON lines):**
 
 ```
-[your answer here]
+[LOGGED] timestamp=2026-06-22T06:47:30.748877Z | tier=caution | question="Can I replace an electrical outlet that stopped wo..." | question_len=56 | response_preview_len=200
+
+[LOGGED] timestamp=2026-06-22T06:47:48.883009Z | tier=caution | question="How do I unclog a slow bathroom drain?" | question_len=38 | response_preview_len=200
+
+[LOGGED] timestamp=2026-06-22T06:47:54.661614Z | tier=caution | question="How do I reset a GFCI outlet that won't reset?" | question_len=46 | response_preview_len=200
 ```
 
 **One field you'd add to the log if this were a real production system handling 10,000 questions per day:**
 
 ```
-[your answer here]
+A session ID.
 ```
